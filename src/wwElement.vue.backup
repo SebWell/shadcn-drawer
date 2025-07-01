@@ -16,31 +16,31 @@
       :class="cn(
         'fixed z-50 flex h-auto flex-col rounded-t-[10px] border bg-background',
         // Bottom drawer (default mobile pattern)
-        direction === 'bottom' || !direction ? 'inset-x-0 bottom-0 max-h-[96%]' : '',
+        content.direction === 'bottom' || !content.direction ? 'inset-x-0 bottom-0 max-h-[96%]' : '',
         // Top drawer
-        direction === 'top' ? 'inset-x-0 top-0 max-h-[96%] rounded-t-none rounded-b-[10px]' : '',
+        content.direction === 'top' ? 'inset-x-0 top-0 max-h-[96%] rounded-t-none rounded-b-[10px]' : '',
         // Left drawer (for desktop)
-        direction === 'left' ? 'inset-y-0 left-0 h-full w-3/4 max-w-sm rounded-r-[10px] rounded-l-none' : '',
+        content.direction === 'left' ? 'inset-y-0 left-0 h-full w-3/4 max-w-sm rounded-r-[10px] rounded-l-none' : '',
         // Right drawer (for desktop)
-        direction === 'right' ? 'inset-y-0 right-0 h-full w-3/4 max-w-sm rounded-l-[10px] rounded-r-none' : '',
+        content.direction === 'right' ? 'inset-y-0 right-0 h-full w-3/4 max-w-sm rounded-l-[10px] rounded-r-none' : '',
         // Animation classes
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
-        direction === 'bottom' || !direction ? 'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom' : '',
-        direction === 'top' ? 'data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top' : '',
-        direction === 'left' ? 'data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left' : '',
-        direction === 'right' ? 'data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right' : '',
-        customClass
+        content.direction === 'bottom' || !content.direction ? 'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom' : '',
+        content.direction === 'top' ? 'data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top' : '',
+        content.direction === 'left' ? 'data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left' : '',
+        content.direction === 'right' ? 'data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right' : '',
+        content.customClass
       )"
-      :style="customStyle"
+      :style="content.customStyle"
       role="dialog"
-      :aria-labelledby="title ? 'drawer-title' : undefined"
-      :aria-describedby="description ? 'drawer-description' : undefined"
+      :aria-labelledby="content.title ? 'drawer-title' : undefined"
+      :aria-describedby="content.description ? 'drawer-description' : undefined"
       @keydown="handleKeyDown"
       tabindex="-1"
     >
       <!-- Drag handle -->
       <div 
-        v-if="showHandle !== false && (direction === 'bottom' || direction === 'top' || !direction)"
+        v-if="content.showHandle !== false && (content.direction === 'bottom' || content.direction === 'top' || !content.direction)"
         class="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted cursor-grab active:cursor-grabbing"
         @mousedown="handleDragStart"
         @touchstart="handleDragStart"
@@ -48,38 +48,38 @@
 
       <!-- Header -->
       <div 
-        v-if="showHeader !== false"
+        v-if="content.showHeader !== false"
         :class="cn(
           'flex flex-col space-y-1.5 p-4 text-center sm:text-left',
-          showHandle !== false && (direction === 'bottom' || direction === 'top' || !direction) ? 'pt-2' : ''
+          content.showHandle !== false && (content.direction === 'bottom' || content.direction === 'top' || !content.direction) ? 'pt-2' : ''
         )"
       >
         <div class="flex items-center justify-between">
           <div class="space-y-1">
             <h2
-              v-if="title"
+              v-if="content.title"
               id="drawer-title"
               class="text-lg font-semibold leading-none tracking-tight"
             >
-              {{ title }}
+              {{ content.title }}
             </h2>
             <p
-              v-if="description"
+              v-if="content.description"
               id="drawer-description"
               class="text-sm text-muted-foreground"
             >
-              {{ description }}
+              {{ content.description }}
             </p>
           </div>
           
           <!-- Close button -->
           <button
-            v-if="showClose !== false"
+            v-if="content.showClose !== false"
             @click="closeDrawer"
             :class="cn(
               'absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none'
             )"
-            :aria-label="closeLabel || 'Close'"
+            :aria-label="content.closeLabel || 'Close'"
           >
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -92,18 +92,18 @@
       <div 
         :class="cn(
           'flex-1 overflow-auto p-4',
-          showHeader === false ? 'pt-8' : '',
-          contentClass
+          content.showHeader === false ? 'pt-8' : '',
+          content.contentClass
         )"
       >
         <!-- Custom content -->
-        <div v-if="content" v-html="content" />
+        <div v-if="content.content" v-html="content.content" />
         
         <!-- Quick actions -->
-        <div v-if="quickActions && quickActions.length > 0" class="mb-6">
+        <div v-if="content.quickActions && content.quickActions.length > 0" class="mb-6">
           <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <button
-              v-for="(action, index) in quickActions"
+              v-for="(action, index) in content.quickActions"
               :key="action.id || index"
               @click="handleQuickAction(action)"
               :disabled="action.disabled"
@@ -126,9 +126,9 @@
         </div>
 
         <!-- List items -->
-        <div v-if="items && items.length > 0" class="space-y-1">
+        <div v-if="content.items && content.items.length > 0" class="space-y-1">
           <button
-            v-for="(item, index) in items"
+            v-for="(item, index) in content.items"
             :key="item.id || index"
             @click="handleItemClick(item, index)"
             :disabled="item.disabled"
@@ -165,15 +165,15 @@
 
       <!-- Footer with actions -->
       <div
-        v-if="showFooter !== false && actions && actions.length > 0"
+        v-if="content.showFooter !== false && content.actions && content.actions.length > 0"
         :class="cn(
           'border-t p-4',
-          footerClass
+          content.footerClass
         )"
       >
         <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
           <button
-            v-for="(action, index) in actions"
+            v-for="(action, index) in content.actions"
             :key="action.id || index"
             @click="handleAction(action)"
             :disabled="action.disabled"
@@ -249,13 +249,13 @@ export default {
     }
 
     const handleBackdropClick = () => {
-      if (props.closeOnBackdrop !== false) {
+      if (props.content.closeOnBackdrop !== false) {
         closeDrawer()
       }
     }
 
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape' && props.closeOnEscape !== false) {
+      if (event.key === 'Escape' && props.content.closeOnEscape !== false) {
         event.preventDefault()
         closeDrawer()
       }
@@ -291,7 +291,7 @@ export default {
 
     // Drag to close functionality (for mobile)
     const handleDragStart = (event) => {
-      if (!props.dragToClose) return
+      if (!props.content.dragToClose) return
       
       isDragging.value = true
       dragStartY.value = event.type === 'mousedown' ? event.clientY : event.touches[0].clientY
@@ -304,7 +304,7 @@ export default {
         const deltaY = currentY - dragStartY.value
         
         // Only allow downward drag for bottom drawer
-        if (props.direction === 'bottom' || !props.direction) {
+        if (props.content.direction === 'bottom' || !props.content.direction) {
           if (deltaY > 0) {
             currentTranslateY.value = deltaY
             const drawerElement = document.querySelector('[role="dialog"]')
